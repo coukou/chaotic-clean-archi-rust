@@ -1,0 +1,9 @@
+{
+  "name": "auth-module-wasm",
+  "version": "0.1.0",
+  "module": "pkg/auth_module_wasm.js",
+  "types": "pkg/auth_module_wasm.d.ts",
+  "scripts": {
+    "install": "wasm-pack build"
+  }
+}

@@ -26,6 +26,7 @@ async fn main() {
         .layer(Extension(SHARED_CONTEXT.clone()));
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    println!("rest-api server listenin on: {}", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await

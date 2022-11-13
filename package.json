@@ -6,7 +6,8 @@
   "author": "coukou",
   "license": "MIT",
   "workspaces": [
-    "packages/auth-module-wasm/pkg",
-    "apps/browser"
+    "packages/auth-module-wasm",
+    "apps/browser",
+    "apps/rest-api"
   ]
 }
