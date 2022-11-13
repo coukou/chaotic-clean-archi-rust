@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "apps/rest-api",
+    "packages/auth-module",
+    "packages/kernel",
+    "packages/auth-module-wasm"
+]

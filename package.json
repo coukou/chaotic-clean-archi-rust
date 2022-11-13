@@ -1,0 +1,12 @@
+{
+  "name": "chaotic-clean-archi-rust",
+  "version": "1.0.0",
+  "private": "true",
+  "main": "index.js",
+  "author": "coukou",
+  "license": "MIT",
+  "workspaces": [
+    "packages/auth-module-wasm/pkg",
+    "apps/browser"
+  ]
+}
