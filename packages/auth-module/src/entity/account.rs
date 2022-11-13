@@ -5,7 +5,14 @@ use serde::{Deserialize, Serialize};
 
 use crate::value::Password;
 
-pub struct Id(String);
+#[derive(Clone, Serialize, Deserialize, Default)]
+pub struct Id(kernel::value::Id);
+
+impl Id {
+    pub fn to_string(&self) -> String {
+        self.0.to_string()
+    }
+}
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Props {
@@ -15,13 +22,22 @@ pub struct Props {
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Account {
+    id: Id,
+
     #[serde(flatten)]
     props: Props,
 }
 
 impl Account {
     pub fn new(props: Props) -> Self {
-        Self { props }
+        Self {
+            id: Id(kernel::value::Id::new()),
+            props,
+        }
+    }
+
+    pub fn id(&self) -> &Id {
+        &self.id
     }
 }
 
