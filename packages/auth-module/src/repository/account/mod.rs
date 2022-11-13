@@ -10,6 +10,10 @@ pub trait AccountRepository {
         &self,
         account_email: &kernel::value::Email,
     ) -> Result<crate::Account, kernel::Error>;
+    async fn find(
+        &self,
+        account_email: &kernel::value::Email,
+    ) -> Result<Option<crate::Account>, kernel::Error>;
     // async fn delete(&self, account: &crate::Account) -> Result<(), kernel::Error>;
 }
 

@@ -23,19 +23,30 @@ impl AccountRepository for InMemoryAccountRepository {
         }
     }
 
-    async fn get(
+    async fn find(
         &self,
         account_email: &kernel::value::Email,
-    ) -> Result<crate::Account, kernel::Error> {
+    ) -> Result<Option<crate::Account>, kernel::Error> {
         match self.accounts.try_read() {
             Ok(accounts) => {
                 let key = &String::from(account_email.clone());
                 if let Some(account) = accounts.get(key) {
-                    return Ok(account.clone());
+                    return Ok(Some(account.clone()));
                 }
-                Err(kernel::Error::RepositoryError)?
             }
             Err(_) => Err(kernel::Error::RepositoryError)?,
         }
+        Ok(None)
+    }
+
+    async fn get(
+        &self,
+        account_email: &kernel::value::Email,
+    ) -> Result<crate::Account, kernel::Error> {
+        let account = self.find(account_email).await?;
+        if let Some(account) = account {
+            return Ok(account);
+        }
+        Err(kernel::Error::RepositoryError)?
     }
 }
