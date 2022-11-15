@@ -3,6 +3,7 @@ mod repository;
 use std::sync::Arc;
 
 use lazy_static::lazy_static;
+use repository::account::LocalStorageAccountRepository;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -16,9 +17,21 @@ extern "C" {
     fn alert(s: &str);
 }
 
+struct AuthContext {
+    account_repository: LocalStorageAccountRepository,
+}
+
+impl auth_module::Context for AuthContext {
+    type AccountRepository = LocalStorageAccountRepository;
+
+    fn account_repository(&self) -> &Self::AccountRepository {
+        &self.account_repository
+    }
+}
+
 lazy_static! {
-    static ref AUTH_CONTEXT: Arc<auth_module::Context> = Arc::new(auth_module::Context {
-        account_repository: Arc::new(repository::account::LocalStorageAccountRepository::new())
+    static ref AUTH_CONTEXT: Arc<AuthContext> = Arc::new(AuthContext {
+        account_repository: repository::account::LocalStorageAccountRepository::new(),
     });
 }
 
@@ -39,7 +52,7 @@ impl From<Error> for JsError {
 #[wasm_bindgen]
 pub async fn register(email: &str, password: &str) -> Result<(), JsError> {
     auth_module::usecase::register(
-        AUTH_CONTEXT.clone(),
+        AUTH_CONTEXT.as_ref(),
         email.to_string(),
         password.to_string(),
     )
@@ -52,7 +65,7 @@ pub async fn register(email: &str, password: &str) -> Result<(), JsError> {
 #[wasm_bindgen]
 pub async fn authenticate(email: &str, password: &str) -> Result<String, JsError> {
     let token = auth_module::usecase::authenticate(
-        AUTH_CONTEXT.clone(),
+        AUTH_CONTEXT.as_ref(),
         email.to_string(),
         password.to_string(),
     )

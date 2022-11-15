@@ -5,16 +5,27 @@ use axum::{routing::post, Extension, Json, Router};
 use lazy_static::lazy_static;
 use serde::Deserialize;
 
-#[derive(Clone)]
+struct AuthContext {
+    account_repository: InMemoryAccountRepository,
+}
+
+impl auth_module::Context for AuthContext {
+    type AccountRepository = InMemoryAccountRepository;
+
+    fn account_repository(&self) -> &Self::AccountRepository {
+        &self.account_repository
+    }
+}
+
 struct SharedContext {
-    pub auth_context: Arc<auth_module::Context>,
+    pub auth_context: AuthContext,
 }
 
 lazy_static! {
     static ref SHARED_CONTEXT: Arc<SharedContext> = Arc::new(SharedContext {
-        auth_context: Arc::new(auth_module::Context {
-            account_repository: Arc::new(InMemoryAccountRepository::default())
-        }),
+        auth_context: AuthContext {
+            account_repository: InMemoryAccountRepository::default()
+        },
     });
 }
 
@@ -44,7 +55,7 @@ async fn register(
     Json(payload): Json<RegisterRequest>,
 ) {
     auth_module::usecase::register(
-        context.auth_context.clone(),
+        &context.clone().auth_context,
         payload.email,
         payload.password,
     )
@@ -63,7 +74,7 @@ async fn authenticate(
     Json(payload): Json<AuthRequest>,
 ) -> String {
     auth_module::usecase::authenticate(
-        context.auth_context.clone(),
+        &context.clone().auth_context,
         payload.email,
         payload.password,
     )

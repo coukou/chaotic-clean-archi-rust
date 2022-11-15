@@ -1,21 +1,27 @@
-use crate::DynAccountRepository;
+use crate::AccountRepository;
 
-pub struct Context {
-    pub account_repository: DynAccountRepository,
+pub trait Context {
+    type AccountRepository: AccountRepository;
+
+    fn account_repository(&self) -> &Self::AccountRepository;
 }
 
 #[cfg(test)]
 mod test {
 
-    use std::sync::Arc;
+    use crate::repository::AccountRepositoryContainer;
 
-    use crate::MockAccountRepository;
+    use super::Context;
 
-    impl super::Context {
-        pub fn fake() -> Self {
-            Self {
-                account_repository: Arc::new(MockAccountRepository::default()),
-            }
+    struct FakeContext {
+        account_repository: AccountRepositoryContainer,
+    }
+
+    impl Context for FakeContext {
+        type AccountRepository = AccountRepositoryContainer;
+
+        fn account_repository(&self) -> &Self::AccountRepository {
+            &self.account_repository
         }
     }
 }
